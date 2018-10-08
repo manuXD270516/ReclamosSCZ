@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Principal">
+        <activity android:name=".View.ViewIndex">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,6 +23,10 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider327462621349425"
+            android:exported="true" />
 
         <activity
             android:name="com.facebook.FacebookActivity"
@@ -34,15 +38,14 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
 
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".ViewLogin"></activity>
+        <activity android:name=".View.ViewLogin"></activity>
+        <activity android:name=".View.ViewCategorias"></activity>
     </application>
 
 </manifest>
