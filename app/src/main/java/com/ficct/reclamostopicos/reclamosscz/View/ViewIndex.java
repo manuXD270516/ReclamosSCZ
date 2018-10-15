@@ -44,10 +44,12 @@ public class ViewIndex extends AppCompatActivity implements GoogleApiClient.OnCo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
 
+
+
         Thread hilo=new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println(c);
+                System.out.println("###################################################"+c+"######################");
                 c++;
             }
         });
