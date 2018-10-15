@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".View.ViewReclamo">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:textSize="24dp"
+                android:text="RECLAMOS ALCALDIA"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+            android:textSize="24dp"
+            android:id="@+id/tvCategoria_ReclamosView"
+            android:text="CATEGORIA ACTUAL"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="24dp"
+                android:id="@+id/tvPrueba"
+                android:text=""
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:layout_marginRight="20dp"
+                android:layout_gravity="right"
+                android:layout_width="50dp"
+                android:onClick="selectImgReclamos"
+                android:background="@drawable/add"
+                android:layout_height="40dp" />
+
+            <android.support.v4.view.ViewPager
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/vpImagenes_ViewReclamos"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="Ingrese el Titulo del Reclamo"
+                android:id="@+id/etTitulo_ReclamosView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="Ingrese descripcion"
+                android:id="@+id/etDescripcion_ReclamosView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="Ingrese el Barrio"
+                android:id="@+id/etBarrio_ReclamosView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="Ingrese la Zona"
+                android:id="@+id/etZona_ReclamosView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="Ingrese la Calle"
+                android:id="@+id/etCalle_ReclamosView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <Switch
+                android:layout_marginTop="5dp"
+                android:textSize="18dp"
+                android:text="Denunciar Anonimamente    "
+                android:id="@+id/swAnonimo_ReclamosView"
+                android:layout_marginLeft="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="20dp"
+                android:onClick="guardarReclamoLocal"
+                android:textColor="@color/colorAccent"
+                android:background="@drawable/background_gradient"
+                android:text="GUARDAR" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

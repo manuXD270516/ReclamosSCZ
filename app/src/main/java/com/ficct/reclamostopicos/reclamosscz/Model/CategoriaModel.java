@@ -1,7 +1,7 @@
 package com.ficct.reclamostopicos.reclamosscz.Model;
 
 /**
- * Created by Ronald Lopez on 02/11/2017.
+ * Created by Manuel Saavedra
  */
 
 public class CategoriaModel {

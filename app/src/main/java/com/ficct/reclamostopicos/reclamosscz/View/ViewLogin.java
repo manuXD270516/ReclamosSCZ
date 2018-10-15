@@ -1,6 +1,8 @@
 package com.ficct.reclamostopicos.reclamosscz.View;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +19,8 @@ import com.android.volley.toolbox.Volley;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.ficct.reclamostopicos.reclamosscz.Interfaces.IPresenterViewLogin;
@@ -34,13 +38,13 @@ import com.ficct.reclamostopicos.reclamosscz.WebServices.*;
 
 public class ViewLogin extends AppCompatActivity implements IViewPresenterLogin, GoogleApiClient.OnConnectionFailedListener {
 
-    private EditText tvUser, tvPass;
     private IPresenterViewLogin loginPresenter;
 
     private CallbackManager callbackManager;
     private LoginButton loginButton;
     private GoogleApiClient googleApiClient;
     private SignInButton signInButton;
+    SharedPreferences sharedPreferences;
 
     private static final int CODE_SIGN_GOOGLE = 777;
 
@@ -61,14 +65,14 @@ public class ViewLogin extends AppCompatActivity implements IViewPresenterLogin,
     }
 
     private void goIndex() {
-        Intent intent = new Intent(this, ViewIndex.class);
+
+        Intent intent = new Intent(ViewLogin.this, ViewIndex.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
     private void iniciarInstancias() {
-        tvUser = (EditText) findViewById(R.id.tvEmail_Login);
-        tvPass = (EditText) findViewById(R.id.tvPassword_Login);
+        sharedPreferences=getSharedPreferences("credenciales_user",Context.MODE_PRIVATE);
         loginButton = (LoginButton) findViewById(R.id.SignLogin_button_Login);
 
         callbackManager = CallbackManager.Factory.create();
@@ -79,6 +83,7 @@ public class ViewLogin extends AppCompatActivity implements IViewPresenterLogin,
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
+                sharedPreferences.edit().putString("access","FB").commit();
                 goIndex();
             }
 
@@ -176,6 +181,7 @@ public class ViewLogin extends AppCompatActivity implements IViewPresenterLogin,
 
         if (requestCode == CODE_SIGN_GOOGLE) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            sharedPreferences.edit().putString("access","GOOGLE");
             handleSignInResult(result);
         }
     }

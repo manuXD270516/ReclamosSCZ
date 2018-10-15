@@ -3,6 +3,8 @@
     package="com.ficct.reclamostopicos.reclamosscz">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -44,8 +46,13 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".View.ViewLogin"></activity>
-        <activity android:name=".View.ViewCategorias"></activity>
+        <activity
+            android:name=".View.ViewLogin"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".View.ViewCategorias" />
+        <activity android:name=".View.ViewReclamo" />
+        <activity android:name=".View.ViewHistorialReclamo"></activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.ficct.reclamostopicos.reclamosscz.View;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
@@ -19,9 +20,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.ficct.reclamostopicos.reclamosscz.Model.CategoriaModel;
 import com.ficct.reclamostopicos.reclamosscz.R;
@@ -38,7 +37,7 @@ public class ViewCategorias extends AppCompatActivity {
     public RecyclerView recyclerView;
     LinearLayoutManager layoutManager;
     private CategoriaAdapter adapter;
-    private ArrayList<CategoriaModel> listaICategorias;
+    private ArrayList<CategoriaModel> listaCategorias;
 
 
     @Override
@@ -62,8 +61,8 @@ public class ViewCategorias extends AppCompatActivity {
                             for (int i=0;i<array.length();i++){
                                 CategoriaModel x= new CategoriaModel();
                                 x.setDescripcion(array.getJSONObject(i).getString("nombre"));
-                                x.setIdImg(R.drawable.ic_user_login);
-                                listaICategorias.add(x);
+                                x.setIdImg(R.drawable.ic_img_categoria);
+                                listaCategorias.add(x);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -76,52 +75,26 @@ public class ViewCategorias extends AppCompatActivity {
                     }
         });
         queue.add(objRequest);
-        /*StringRequest stringRequest = new StringRequest(Request.Method.GET, urlFinal, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                for (int i=0)
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "El usuario no se puedo regustrar en la base de datos", Toast.LENGTH_LONG).show();
-            }
-        });*/
     }
 
 
     private void iniciar() {
         recyclerView = (RecyclerView) findViewById(R.id.rvCategorias);
-        try {
-            layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setHasFixedSize(true);
-        } catch (Exception e){
-            String err=e.getMessage();
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
+        listaCategorias=new ArrayList<>();
 
-        }
-
-        listaICategorias = new ArrayList<>();
-        /*CategoriaModel x= new CategoriaModel();
-        x.descripcion="dadsa";
+        CategoriaModel x= new CategoriaModel();
+        x.descripcion="SEGURIDAD URBANA (PRUEBA)";
         x.setIdImg(R.drawable.ic_user_login);
-        listaICategorias.add(x);*/
-        setCategorias();
-        adapter = new CategoriaAdapter(this, listaICategorias);
+        listaCategorias.add(x);
+        //setCategorias();
+        adapter = new CategoriaAdapter(this, listaCategorias);
         recyclerView.setAdapter(adapter);
 
 
-        /*new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (recyclerView.getAdapter() != null) {
-                    if (recyclerView.getAdapter().getItemCount() == 0) {
-                        recyclerView.setBackgroundResource(R.drawable.fondo_principal);
-                        progressDialog.cancel();
-                    }
-                }
-            }
-        }, 8000);*/
+
     }
 
     /*private void tocarItem(final String titulo, final String descripcion, final String fecha) {
@@ -222,8 +195,7 @@ public class ViewCategorias extends AppCompatActivity {
         private Context context;
 
         public CategoriaAdapter(Context context, ArrayList<CategoriaModel> arrayList) {
-            categoriasList = arrayList;
-            //publicacionesFilterList = arrayList;
+            categoriasList = new ArrayList<>(arrayList);
             this.context = context;
         }
 
@@ -239,15 +211,24 @@ public class ViewCategorias extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final myViewHolader viewHolder, final int i) {
             //Glide.with(ViewCategorias.this).load(publicacionesFilterList.get(i).getImagen()).into(viewHolder.imagen);
-            viewHolder.imagen.setOnLongClickListener(new View.OnLongClickListener() {
+            /*viewHolder.imagen.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
                     //tocarItem(publicacionesFilterList.get(i).getTitulo(), publicacionesFilterList.get(i).getDescripcion(), publicacionesFilterList.get(i).getFecha());
                     return false;
                 }
-            });
+            });*/
             viewHolder.descripcion.setText(categoriasList.get(i).getDescripcion());
             viewHolder.imagen.setImageDrawable(getDrawable(R.drawable.ic_user_login));
+            viewHolder.imagen.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                        //Toast.makeText(ViewCategorias.this,String.valueOf(i),Toast.LENGTH_SHORT).show();
+                        Intent intent=new Intent(ViewCategorias.this,ViewReclamo.class);
+                        intent.putExtra("categoria", listaCategorias.get(i).getDescripcion());
+                        startActivity(intent);
+                }
+            });
             //progressDialog.dismiss();
         }
 
@@ -255,7 +236,7 @@ public class ViewCategorias extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return categoriasList.size();
+            return categoriasList.isEmpty()?0:categoriasList.size();
         }
 
 

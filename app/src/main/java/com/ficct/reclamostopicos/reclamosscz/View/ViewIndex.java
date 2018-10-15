@@ -1,6 +1,8 @@
 package com.ficct.reclamostopicos.reclamosscz.View;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,14 +34,26 @@ public class ViewIndex extends AppCompatActivity implements GoogleApiClient.OnCo
     private TextView nameTextView;
     private TextView emailTextView;
     private TextView idTextView;
-
+    private SharedPreferences sharedPreferences;
     private GoogleApiClient googleApiClient;
+    int c=0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
 
+        Thread hilo=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(c);
+                c++;
+            }
+        });
+        hilo.start();
+
+        sharedPreferences=getSharedPreferences("credenciales_user",Context.MODE_PRIVATE);
         photoImageView = (ImageView) findViewById(R.id.photoImageView);
         nameTextView = (TextView) findViewById(R.id.nameTextView);
         emailTextView = (TextView) findViewById(R.id.emailTextView);
@@ -86,7 +100,10 @@ public class ViewIndex extends AppCompatActivity implements GoogleApiClient.OnCo
             idTextView.setText(account.getId());
             Glide.with(this).load(account.getPhotoUrl()).into(photoImageView);
         } else {
-            goLogInScreen();
+            if (sharedPreferences.getString("access","").length()==0){
+                goLogInScreen();
+            }
+
         }
     }
 
@@ -114,7 +131,10 @@ public class ViewIndex extends AppCompatActivity implements GoogleApiClient.OnCo
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
         if (isLoggedIn){
-            //LoginManager.getInstance().logOut();
+            LoginManager.getInstance().logOut();
+            Intent intent = new Intent(this, ViewLogin.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         }
     }
 
@@ -124,4 +144,6 @@ public class ViewIndex extends AppCompatActivity implements GoogleApiClient.OnCo
         startActivity(intent);
 
     }
+
+
 }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "531406236288",
+    "firebase_url": "https://reclamos-scz.firebaseio.com",
+    "project_id": "reclamos-scz",
+    "storage_bucket": "reclamos-scz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:531406236288:android:0491df80c80aa052",
+        "android_client_info": {
+          "package_name": "com.ficct.reclamostopicos.reclamosscz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "531406236288-f8ho1f76rbjmqas9h5kc6se0uf7lib7f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ficct.reclamostopicos.reclamosscz",
+            "certificate_hash": "0a84d7221802d6bf9918134440be2c23d9190daa"
+          }
+        },
+        {
+          "client_id": "531406236288-b2sv2upqinbs3jg2b6jis1ocrt2t7jan.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrlZxXRtf2nw6ZFx5LLuL2YTIyTbORFDM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "531406236288-b2sv2upqinbs3jg2b6jis1ocrt2t7jan.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
