@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -19,8 +18,6 @@ import com.android.volley.toolbox.Volley;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.ficct.reclamostopicos.reclamosscz.Interfaces.IPresenterViewLogin;
@@ -30,7 +27,6 @@ import com.ficct.reclamostopicos.reclamosscz.R;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.auth.api.signin.SignInAccount;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -123,7 +119,7 @@ public class ViewLogin extends AppCompatActivity implements IViewPresenterLogin,
     private void loginGoogle() {
         RequestQueue queue = Volley.newRequestQueue(this);
 
-        String urlFinal= Constantes.URL_REGISTRODATOS_RECLAMOS;
+        String urlFinal= Constantes.URL_GET_CATEGORIAS;
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, urlFinal, new Response.Listener<String>() {
             @Override

@@ -50,7 +50,7 @@ public class ViewCategorias extends AppCompatActivity {
 
     private void setCategorias() {
         RequestQueue queue = Volley.newRequestQueue(this);
-        String urlFinal= Constantes.URL_REGISTRODATOS_RECLAMOS;
+        String urlFinal= Constantes.URL_GET_CATEGORIAS;
         JsonObjectRequest objRequest=new JsonObjectRequest(
                 Request.Method.GET, urlFinal,
                 new Response.Listener<JSONObject>() {
@@ -64,6 +64,7 @@ public class ViewCategorias extends AppCompatActivity {
                                 x.setIdImg(R.drawable.ic_img_categoria);
                                 listaCategorias.add(x);
                             }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -90,6 +91,7 @@ public class ViewCategorias extends AppCompatActivity {
         x.setIdImg(R.drawable.ic_user_login);
         listaCategorias.add(x);
         //setCategorias();
+
         adapter = new CategoriaAdapter(this, listaCategorias);
         recyclerView.setAdapter(adapter);
 

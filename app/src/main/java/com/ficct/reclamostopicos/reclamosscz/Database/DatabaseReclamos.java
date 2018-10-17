@@ -3,7 +3,6 @@ package com.ficct.reclamostopicos.reclamosscz.Database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.ficct.reclamostopicos.reclamosscz.WebServices.Constantes;
@@ -19,8 +18,8 @@ public class DatabaseReclamos extends SQLiteOpenHelper{
 
 	private static final String COMMA_SEP = ",";
 	private static final String SQL_CREATE_ENTRIES =
-	    "CREATE TABLE " + Constantes.TABLE_NAME + " (" +
-				Constantes._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+	    "CREATE TABLE " + Constantes.TABLE_RECLAMOS + " (" +
+				Constantes.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				Constantes.COLUMN_TITULO + TEXT_TYPE + COMMA_SEP +
 				Constantes.COLUMN_DESCRIPCION + TEXT_TYPE + COMMA_SEP +
 				Constantes.COLUMN_CALLE+ TEXT_TYPE + COMMA_SEP +
@@ -32,7 +31,7 @@ public class DatabaseReclamos extends SQLiteOpenHelper{
 				Constantes.COLUMN_CATEGORIA + TEXT_TYPE + COMMA_SEP +
 				Constantes.COLUMN_ESTADO + TEXT_TYPE + " )";
 
-	private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + Constantes.TABLE_NAME;
+	private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + Constantes.TABLE_RECLAMOS;
 	public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "ReclamosDBLocal.sqlite";
 

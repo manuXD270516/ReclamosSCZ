@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
@@ -30,21 +31,28 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.StringRequest;
 import com.ficct.reclamostopicos.reclamosscz.Database.DatabaseReclamos;
 import com.ficct.reclamostopicos.reclamosscz.R;
 import com.ficct.reclamostopicos.reclamosscz.WebServices.Constantes;
-
-import org.w3c.dom.Text;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class ViewReclamo extends AppCompatActivity {
 
     private TextView tvCategoria;
-    private EditText etBarrio,etZona,etCalle,etTitulo,etDescripcion;
+    private EditText etBarrio, etZona, etCalle, etTitulo, etDescripcion;
     private Switch swAnonimo;
     private DatabaseReclamos dbReclamos;
     private ViewPager vpImgReclamos;
@@ -52,8 +60,12 @@ public class ViewReclamo extends AppCompatActivity {
     private ImagePagerAdapter adaptadorImgSlide;
     private static final int PICK_IMAGE = 100;
     private Uri[] imgsUri;
+    private StorageReference storageReference;
+    private FirebaseStorage storage;
 
-    private double latitud,longitud;
+
+    private double latitud, longitud;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,27 +75,32 @@ public class ViewReclamo extends AppCompatActivity {
     }
 
     private void iniciarInstancias() {
-        tvCategoria=(TextView)findViewById(R.id.tvCategoria_ReclamosView);
-        etBarrio=(EditText) findViewById(R.id.etBarrio_ReclamosView);
-        etCalle=(EditText) findViewById(R.id.etTitulo_ReclamosView);
-        etTitulo=(EditText) findViewById(R.id.etDescripcion_ReclamosView);
-        etDescripcion=(EditText) findViewById(R.id.etCalle_ReclamosView);
-        etZona=(EditText) findViewById(R.id.etZona_ReclamosView);
-        swAnonimo=(Switch) findViewById(R.id.swAnonimo_ReclamosView);
-        vpImgReclamos=(ViewPager)findViewById(R.id.vpImagenes_ViewReclamos);
+        tvCategoria = (TextView) findViewById(R.id.tvCategoria_ReclamosView);
+        etBarrio = (EditText) findViewById(R.id.etBarrio_ReclamosView);
+        etCalle = (EditText) findViewById(R.id.etTitulo_ReclamosView);
+        etTitulo = (EditText) findViewById(R.id.etDescripcion_ReclamosView);
+        etDescripcion = (EditText) findViewById(R.id.etCalle_ReclamosView);
+        etZona = (EditText) findViewById(R.id.etZona_ReclamosView);
+        swAnonimo = (Switch) findViewById(R.id.swAnonimo_ReclamosView);
+        vpImgReclamos = (ViewPager) findViewById(R.id.vpImagenes_ViewReclamos);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        if (getIntent()!=null){
-           tvCategoria.setText(getIntent().getStringExtra("categoria").toUpperCase());
+        if (getIntent() != null) {
+            tvCategoria.setText(getIntent().getStringExtra("categoria").toUpperCase());
         }
+
+        storage = FirebaseStorage.getInstance();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public void guardarReclamoLocal(View view) throws IOException {
+    public void guardarReclamoLocal(final View view) throws IOException {
+        //selectAllReclamo(view);
+
+
         //Se inicializa la clase.
         dbReclamos = new DatabaseReclamos(this);
 
-        SQLiteDatabase sqlite = dbReclamos.getWritableDatabase();
+        //final SQLiteDatabase sqlite = dbReclamos.getWritableDatabase();
         String titulo = etTitulo.getText().toString();
         String descripcion = etDescripcion.getText().toString();
         String calle = etCalle.getText().toString();
@@ -91,31 +108,57 @@ public class ViewReclamo extends AppCompatActivity {
         String barrio = etBarrio.getText().toString();
         String categoria = tvCategoria.getText().toString();
 
-        ContentValues content = new ContentValues();
-
-        byte[] inputData=null;
+        storageReference = storage.getReference("IMAGENES_RECLAMOS");
+        final StorageReference refImgReclamos = storageReference.child(String.valueOf(System.currentTimeMillis()));
+        /*byte[] inputData=null;
         if (imgsUri.length>0){
             InputStream iStream =   getContentResolver().openInputStream(imgsUri[0]);
             inputData= getBytes(iStream);
-        }
-        if(titulo.equals("") || descripcion.equals(""))
-        {
+        }*/
+
+        if (titulo.equals("") || descripcion.equals("") || imgsUri.length == 0) {
             Toast.makeText(this, "Revise los datos introducidos. Todos los campos son obligatorios.", Toast.LENGTH_SHORT).show();
-        }else
-        {
+        } else {
+            final ContentValues content = new ContentValues();
             //Se añaden los valores introducidos de cada campo mediante clave(columna)/valor(valor introducido en el campo de texto)
-            content.put(Constantes.COLUMN_TITULO,titulo);
-            content.put(Constantes.COLUMN_DESCRIPCION,descripcion);
-            content.put(Constantes.COLUMN_CATEGORIA,categoria);
-            content.put(Constantes.COLUMN_LATITUD,latitud);
-            content.put(Constantes.COLUMN_LONGITUD,longitud);
-            content.put(Constantes.COLUMN_BARRIO,barrio);
-            content.put(Constantes.COLUMN_ZONA,zona);
-            content.put(Constantes.COLUMN_CALLE,calle);
-            content.put(Constantes.COLUMN_ESTADO,"ENVIADO");
-            content.put(Constantes.COLUMN_IMAGEN,inputData);
-            sqlite.insert(Constantes.TABLE_NAME, null, content);
-            Snackbar.make(view,"Reclamo guardado correctamente!!!",Snackbar.LENGTH_LONG).show();
+            content.put(Constantes.COLUMN_TITULO, titulo);
+            content.put(Constantes.COLUMN_DESCRIPCION, descripcion);
+            content.put(Constantes.COLUMN_CATEGORIA, categoria);
+            content.put(Constantes.COLUMN_LATITUD, latitud);
+            content.put(Constantes.COLUMN_LONGITUD, longitud);
+            content.put(Constantes.COLUMN_BARRIO, barrio);
+            content.put(Constantes.COLUMN_ZONA, zona);
+            content.put(Constantes.COLUMN_CALLE, calle);
+            content.put(Constantes.COLUMN_ESTADO, "NO ENVIADO");
+            UploadTask uploadTask = refImgReclamos.putFile(imgsUri[0]);
+            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    // Continue with the task to get the download URL
+                    return refImgReclamos.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        try {
+                            Uri downloadUri = task.getResult();
+                            content.put(Constantes.COLUMN_IMAGEN, downloadUri.toString());
+                            SQLiteDatabase sqlite = dbReclamos.getReadableDatabase();
+                            sqlite.insert(Constantes.TABLE_RECLAMOS, null, content);
+                            sqlite.close();
+                        } catch (Exception e) {
+                            String error = e.getMessage();
+
+                        }
+
+                    }
+                }
+            });
+            Snackbar.make(view, "Reclamo guardado correctamente!!!", Snackbar.LENGTH_LONG).show();
 
             etTitulo.setText("");
             etDescripcion.setText("");
@@ -123,11 +166,13 @@ public class ViewReclamo extends AppCompatActivity {
             etCalle.setText("");
             etZona.setText("");
 
-            selectAllReclamo(view);
+            //selectAllReclamo(view);
 
         }
+
         //Se cierra la conexión abierta a la Base de Datos
-        sqlite.close();
+
+
     }
 
     private boolean checkLocation() {
@@ -175,6 +220,7 @@ public class ViewReclamo extends AppCompatActivity {
                 }
             });
         }
+
         @Override
         public void onStatusChanged(String s, int i, Bundle bundle) {
         }
@@ -182,6 +228,7 @@ public class ViewReclamo extends AppCompatActivity {
         @Override
         public void onProviderEnabled(String s) {
         }
+
         @Override
         public void onProviderDisabled(String s) {
         }
@@ -259,16 +306,6 @@ public class ViewReclamo extends AppCompatActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            /*Context context = PreguntasAdapter.context.getApplicationContext();
-            ImageView imageView = new ImageView(context);
-            int padding = context.getResources().getDimensionPixelSize(8);
-            imageView.setPadding(padding, padding, padding, padding);
-            //imageView.setScaleType(ImageView.ScaleType.CENTER);
-            imageView.setImageBitmap(mImages[position]);
-            //imageView.setImageResource(mImages[position]);
-            ((ViewPager) container).addView(imageView, 0);
-            return imageView;
-            //return super.instantiateItem(container, position);*/
 
             LayoutInflater inflater = LayoutInflater.from(ViewReclamo.this);
             ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.slide_images, container, false);
@@ -277,7 +314,7 @@ public class ViewReclamo extends AppCompatActivity {
 
             image.setImageURI(urlImages[position]);
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            //image.setImageBitmap(mImages[position]);
+
 
             return layout;
 
@@ -303,51 +340,41 @@ public class ViewReclamo extends AppCompatActivity {
 
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public void selectAllReclamo(View view)
-    {
+    public void selectAllReclamo(View view) {
         //Se inicializa la clase.
         dbReclamos = new DatabaseReclamos(this);
         //Se establecen permisos de lectura
         SQLiteDatabase sqlite = dbReclamos.getReadableDatabase();
         //Columnas que devolverá la consulta.
         String[] columnas = {
-                Constantes._ID,
+                Constantes.COLUMN_ID,
                 Constantes.COLUMN_TITULO,
                 Constantes.COLUMN_DESCRIPCION,
                 Constantes.COLUMN_LATITUD,
-                Constantes.COLUMN_LONGITUD
+                Constantes.COLUMN_LONGITUD,
+                Constantes.COLUMN_IMAGEN
         };
 
         //Ejecuta la sentencia devolviendo los resultados de los parámetros pasados de tabla, columnas, producto y orden de los resultados.
-        Cursor cursor = sqlite.query(Constantes.TABLE_NAME, columnas,  null,null , null, null, null);
+        Cursor cursor = sqlite.query(Constantes.TABLE_RECLAMOS, columnas, null, null, null, null, null);
 
-        if(cursor.getCount() != 0)
-        {
+        if (cursor.getCount() != 0) {
             cursor.moveToLast();
-            String tituloReg=cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_TITULO));
-            long identificador = cursor.getLong(cursor.getColumnIndex(Constantes._ID));
-            double lati,longi;
-            lati= cursor.getLong(cursor.getColumnIndex(Constantes.COLUMN_LATITUD));
+            String tituloReg = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_TITULO));
+            long identificador = cursor.getLong(cursor.getColumnIndex(Constantes.COLUMN_ID));
+            double lati, longi;
+            String imgRuta = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_IMAGEN));
+
+            lati = cursor.getLong(cursor.getColumnIndex(Constantes.COLUMN_LATITUD));
             longi = cursor.getLong(cursor.getColumnIndex(Constantes.COLUMN_LONGITUD));
 
-            TextView x=(TextView)findViewById(R.id.tvPrueba);
-            x.setText("ID : "+String.valueOf(identificador)+"\nTITULO : "+tituloReg);//+"\nLATITUD :"+String.valueOf(lati)+" LONGITUD :"+String.valueOf(longi));
-
-
-            /*Toast.makeText(this, "El Producto " +  edProducto.getText().toString()
-                    + " está almacenado con Identificador " + identificador, 3000).show();*/
-
-
-            /*edProducto.setText("");
-            edCantidad.setText("");
-            edId.setText("");*/
-
+            TextView x = (TextView) findViewById(R.id.tvPrueba);
+            x.setText("ID : " + String.valueOf(identificador) + "\nTITULO : " + tituloReg + "\nRUTA >" + imgRuta);//+"\nLATITUD :"+String.valueOf(lati)+" LONGITUD :"+String.valueOf(longi));
         }
         //Se cierra la conexión abierta a la Base de Datos
         sqlite.close();
 
     }
-    
 
 
 }
