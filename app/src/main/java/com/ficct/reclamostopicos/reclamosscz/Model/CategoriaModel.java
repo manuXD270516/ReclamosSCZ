@@ -6,9 +6,11 @@ package com.ficct.reclamostopicos.reclamosscz.Model;
 
 public class CategoriaModel {
 
-    public String codigo;
+    public int ID;
+    public String nombre;
     public String descripcion;
     public int idImg;
+
 
     public int getIdImg() {
         return idImg;
@@ -19,23 +21,23 @@ public class CategoriaModel {
     }
 
     public CategoriaModel() {
-
+        this(-1,"","",-1);
     }
 
-    public CategoriaModel(String codigo, String descripcion,int idimg) {
-        this.codigo = codigo;
-        this.descripcion = descripcion;
+    public CategoriaModel(int ID, String nombre,String descripcion, int idimg) {
+        this.ID = ID;
+        this.nombre = nombre;
+        this.descripcion=descripcion;
         this.idImg=idimg;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public int getID() {
+        return ID;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setID(int ID) {
+        this.ID = ID;
     }
-
 
     public String getDescripcion() {
         return descripcion;
@@ -43,6 +45,15 @@ public class CategoriaModel {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
 

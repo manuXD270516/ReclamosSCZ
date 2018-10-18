@@ -11,33 +11,29 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.JsonRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.ficct.reclamostopicos.reclamosscz.Database.DatabaseReclamos;
 import com.ficct.reclamostopicos.reclamosscz.WebServices.Constantes;
+import com.ficct.reclamostopicos.reclamosscz.WebServices.VolleySingleton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 
 // encargado de realizar las peticiones constantes
 public class TaskAsynkRegistrarReclamo extends AsyncTask<Void, ReclamoModel, Boolean> {
 
 
-    int contador;
     private boolean trackReclamos;
     private Context context;
-    List<ReclamoModel> reclamosList;
+    LinkedList<ReclamoModel> reclamosList;
+    DatabaseReclamos dbReclamos;
 
     public TaskAsynkRegistrarReclamo() {
         this(null);
@@ -46,6 +42,8 @@ public class TaskAsynkRegistrarReclamo extends AsyncTask<Void, ReclamoModel, Boo
     public TaskAsynkRegistrarReclamo(Context context) {
         this.context = context;
         this.trackReclamos=false;
+        this.reclamosList=new LinkedList<>();
+        dbReclamos= new DatabaseReclamos(context);
     }
 
     public Context getContext() {
@@ -66,10 +64,9 @@ public class TaskAsynkRegistrarReclamo extends AsyncTask<Void, ReclamoModel, Boo
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void selectReclamosNoEnviados() {
-        //Se inicializa la clase.
-        DatabaseReclamos dbReclamos = new DatabaseReclamos(context);
         //Se establecen permisos de lectura
         SQLiteDatabase sqlite = dbReclamos.getReadableDatabase();
+
         //Columnas que devolverá la consulta.
         String[] columnas = {
                 Constantes.COLUMN_ID,
@@ -82,26 +79,34 @@ public class TaskAsynkRegistrarReclamo extends AsyncTask<Void, ReclamoModel, Boo
                 Constantes.COLUMN_LONGITUD,
                 Constantes.COLUMN_IMAGEN,
                 Constantes.COLUMN_ESTADO,
-                Constantes.COLUMN_CATEGORIA
+                Constantes.COLUMN_ID_CATEGORIA
         };
-
         //Ejecuta la sentencia devolviendo los resultados de los parámetros pasados de tabla, columnas, producto y orden de los resultados.
-        Cursor cursor = sqlite.query(Constantes.TABLE_RECLAMOS, columnas, Constantes.COLUMN_ESTADO + "='NO ENVIADO'" , null, null, null, null);
-        while (cursor.moveToNext()) {
-            long ID = cursor.getLong(cursor.getColumnIndex(Constantes.COLUMN_ID));
-            String titulo = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_TITULO));
-            String descripcion = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_DESCRIPCION));
-            String calle = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_CALLE));
-            String barrio = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_BARRIO));
-            String zona = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_ZONA));
-            double latitud = cursor.getDouble(cursor.getColumnIndex(Constantes.COLUMN_LATITUD));
-            double longitud = cursor.getDouble(cursor.getColumnIndex(Constantes.COLUMN_LONGITUD));
-            String imagen = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_IMAGEN));
-            String estado = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_ESTADO));
-            String categoria = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_CATEGORIA));
-            ReclamoModel modelReclamo=new ReclamoModel(ID,titulo,descripcion,calle,barrio,zona,latitud,longitud,imagen,estado,categoria);
-            reclamosList.add(modelReclamo);
+        Cursor cursor = sqlite.query(Constantes.TABLE_RECLAMO, columnas, Constantes.COLUMN_ESTADO + "=?" , new String[]{"no enviado"}, null, null, null);
+        if (cursor!=null){
+            if (cursor.moveToFirst()){
+                do {
+                    long ID = cursor.getLong(cursor.getColumnIndex(Constantes.COLUMN_ID));
+                    String titulo = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_TITULO));
+                    String descripcion = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_DESCRIPCION));
+                    String calle = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_CALLE));
+                    String barrio = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_BARRIO));
+                    String zona = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_ZONA));
+                    double latitud = cursor.getDouble(cursor.getColumnIndex(Constantes.COLUMN_LATITUD));
+                    double longitud = cursor.getDouble(cursor.getColumnIndex(Constantes.COLUMN_LONGITUD));
+                    String imagen = "";
+                    if (cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_IMAGEN))!=null){
+                        imagen=cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_IMAGEN));
+                    }
+                    String estado = cursor.getString(cursor.getColumnIndex(Constantes.COLUMN_ESTADO));
+                    int idCategoria = cursor.getInt(cursor.getColumnIndex(Constantes.COLUMN_ID_CATEGORIA));
+                    ReclamoModel modelReclamo=new ReclamoModel(ID,titulo,descripcion,calle,barrio,zona,latitud,longitud,imagen,estado, idCategoria);
+                    reclamosList.add(modelReclamo);
+                } while (cursor.moveToNext());
+                cursor.close();
+            }
         }
+        sqlite.close();
     }
 
 
@@ -110,44 +115,38 @@ public class TaskAsynkRegistrarReclamo extends AsyncTask<Void, ReclamoModel, Boo
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected Boolean doInBackground(Void... voids) {
-
         while (true) {
             if (isTrackReclamos()){
                 // realizar las consultas locales para obtener
-                selectReclamosNoEnviados();
-                int i=0;
-                while (i<reclamosList.size()){
+                try {
+                    Thread.sleep(1000);
+                    selectReclamosNoEnviados();
+                    while (!reclamosList.isEmpty()){
+                        ReclamoModel reclamoAct=reclamosList.removeFirst();
+                        if (existsConnectionInternet()){
+                            enviarReclamo(reclamoAct);
+                            //publishProgress(reclamoAct);
+                        } else {
+                            reclamosList.addFirst(reclamoAct);
+                        }
+                    }
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                /*int i=0;
+                while (i<reclamosList.size() && !reclamosList.isEmpty()){
                     if (existsConnectionInternet()){
                         publishProgress(reclamosList.get(i));
                         reclamosList.remove(i);
                     } else {
                         i++;
                     }
-                }
-                /*Iterator<ReclamoModel> iterator=reclamosList.iterator();
-                while (iterator.hasNext()){
-                    publishProgress(iterator.next());
                 }*/
-                // realizar las peticiones de datos pendientes para su envio
-                //publishProgress("existe conexion");
-
             } else {
                 break;
             }
-
         }
-
-            /*for (;;){
-                try {
-                    Thread.sleep(1000);
-                    publishProgress(contador*10);
-                    if (isCancelled()){
-                        break;
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }*/
         return true;
     }
 
@@ -160,7 +159,9 @@ public class TaskAsynkRegistrarReclamo extends AsyncTask<Void, ReclamoModel, Boo
 
     @Override
     protected void onPreExecute() {
-        contador = 0;
+        if (!isTrackReclamos()){
+            onCancelled();
+        }
     }
 
     @Override
@@ -210,21 +211,32 @@ public class TaskAsynkRegistrarReclamo extends AsyncTask<Void, ReclamoModel, Boo
 
 
     public void enviarReclamo(final ReclamoModel reclamoModel){
-
-        String urlFinal=Constantes.URL_ADD_RECLAMO;
-        JsonObjectRequest peticion=new JsonObjectRequest(Request.Method.POST, urlFinal,
+        String urlFinal=Constantes.URL_ADD_RECLAMO_WS;
+        Map<String,String> params=new HashMap<>();
+        //params.put(Constantes.COLUMN_ID,String.valueOf(reclamoModel.getID()));
+        params.put(Constantes.COLUMN_TITULO.toLowerCase(),reclamoModel.getTitulo());
+        params.put(Constantes.COLUMN_DESCRIPCION.toLowerCase(),reclamoModel.getDescripcion());
+        params.put(Constantes.COLUMN_CALLE.toLowerCase(),reclamoModel.getCalle());
+        params.put(Constantes.COLUMN_BARRIO.toLowerCase(),reclamoModel.getBarrio());
+        params.put(Constantes.COLUMN_ZONA.toLowerCase(),reclamoModel.getZona());
+        params.put(Constantes.COLUMN_LATITUD.toLowerCase(),String.valueOf(reclamoModel.getLatitud()));
+        params.put(Constantes.COLUMN_LONGITUD.toLowerCase(),String.valueOf(reclamoModel.getLongitud()));
+        params.put(Constantes.COLUMN_ESTADO.toLowerCase(),reclamoModel.getEstado());
+        params.put(Constantes.COLUMN_IMAGEN.toLowerCase(),reclamoModel.getImagen());
+        params.put(Constantes.COLUMN_ID_CATEGORIA.toLowerCase(), String.valueOf(reclamoModel.getIDCategoria()));
+        JSONObject jsonObj=new JSONObject(params);
+        JsonObjectRequest requestAct =new JsonObjectRequest(Request.Method.POST, urlFinal,jsonObj,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            Log.i("VALIDAR ","############################"+response.getString("resp")+"##############################");
                             if (response.getString("resp").equals("SI")){
+                                Log.i("DATO ENVIADO","%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
                                 updateEstadoReclamo(reclamoModel.getID());
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 },
                 new Response.ErrorListener(){
@@ -232,44 +244,24 @@ public class TaskAsynkRegistrarReclamo extends AsyncTask<Void, ReclamoModel, Boo
                     public void onErrorResponse(VolleyError error) {
 
                     }
-                }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params=new HashMap<>();
-                params.put(Constantes.COLUMN_TITULO,reclamoModel.getTitulo());
-                params.put(Constantes.COLUMN_DESCRIPCION,reclamoModel.getDescripcion());
-                params.put(Constantes.COLUMN_CALLE,reclamoModel.getCalle());
-                params.put(Constantes.COLUMN_BARRIO,reclamoModel.getBarrio());
-                params.put(Constantes.COLUMN_ZONA,reclamoModel.getZona());
-                params.put(Constantes.COLUMN_LATITUD,String.valueOf(reclamoModel.getLatitud()));
-                params.put(Constantes.COLUMN_LONGITUD,String.valueOf(reclamoModel.getLongitud()));
-                params.put(Constantes.COLUMN_IMAGEN,reclamoModel.getImagen());
-                params.put(Constantes.COLUMN_ESTADO,reclamoModel.getEstado());
-                params.put(Constantes.COLUMN_CATEGORIA,reclamoModel.getCategoria());
-                return params;
-
-            }
-        };
-        RequestQueue requestQueue=Volley.newRequestQueue(context);
-        requestQueue.add(peticion);
+                });
+        VolleySingleton.getInstance(context).addToRequestQueue(requestAct);
+        /*RequestQueue requestQueue=Volley.newRequestQueue(context);
+        requestQueue.add(requestAct);*/
     }
 
     private  void updateEstadoReclamo(long idReclamoLocal){
         //Se inicializa la clase.
-        DatabaseReclamos dbReclamosInstance = new DatabaseReclamos(context);
-
         //Se establecen permisos de escritura
-        SQLiteDatabase sqlite = dbReclamosInstance.getWritableDatabase();
 
-
+        SQLiteDatabase sqlite = dbReclamos.getWritableDatabase();
         ContentValues content = new ContentValues();
         //Se añaden los valores introducidos de cada campo mediante clave(columna)/valor(valor introducido en el campo de texto)
-        content.put(Constantes.COLUMN_ESTADO, "ENVIADO");
-        //Se establece la condición del _id del producto a modificar
-        String selection = Constantes.COLUMN_ID + " = " + idReclamoLocal;
+        content.put(Constantes.COLUMN_ESTADO, "enviado");
+        //Se establece la condición del _id del a modificar
+        String selection = Constantes.COLUMN_ID + "=" + idReclamoLocal;
 
-        //Se llama al método update pasándole los parámetros para modificar el producto con el identificado como condición de busqueda
-        int count = sqlite.update(Constantes.TABLE_RECLAMOS, content,selection, null);
+        int count = sqlite.update(Constantes.TABLE_RECLAMO, content,selection, null);
         //Se cierra la conexión abierta a la Base de Datos
         sqlite.close();
     }

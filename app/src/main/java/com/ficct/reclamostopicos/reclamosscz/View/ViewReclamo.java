@@ -31,17 +31,13 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.StringRequest;
 import com.ficct.reclamostopicos.reclamosscz.Database.DatabaseReclamos;
 import com.ficct.reclamostopicos.reclamosscz.R;
 import com.ficct.reclamostopicos.reclamosscz.WebServices.Constantes;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -62,9 +58,8 @@ public class ViewReclamo extends AppCompatActivity {
     private Uri[] imgsUri;
     private StorageReference storageReference;
     private FirebaseStorage storage;
-
-
     private double latitud, longitud;
+    private int idCategoriaSelect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,21 +79,20 @@ public class ViewReclamo extends AppCompatActivity {
         swAnonimo = (Switch) findViewById(R.id.swAnonimo_ReclamosView);
         vpImgReclamos = (ViewPager) findViewById(R.id.vpImagenes_ViewReclamos);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        if (getIntent() != null) {
-            tvCategoria.setText(getIntent().getStringExtra("categoria").toUpperCase());
+        dbReclamos = new DatabaseReclamos(this);
+        Bundle datosRecibidos=getIntent()!=null?getIntent().getExtras():null;
+        if (datosRecibidos!= null) {
+            tvCategoria.setText(datosRecibidos.getString("nombre_categoria").toUpperCase());
+            idCategoriaSelect = datosRecibidos.getInt("id_categoria");
         }
-
         storage = FirebaseStorage.getInstance();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void guardarReclamoLocal(final View view) throws IOException {
         //selectAllReclamo(view);
-
-
         //Se inicializa la clase.
-        dbReclamos = new DatabaseReclamos(this);
+
 
         //final SQLiteDatabase sqlite = dbReclamos.getWritableDatabase();
         String titulo = etTitulo.getText().toString();
@@ -106,7 +100,7 @@ public class ViewReclamo extends AppCompatActivity {
         String calle = etCalle.getText().toString();
         String zona = etCalle.getText().toString();
         String barrio = etBarrio.getText().toString();
-        String categoria = tvCategoria.getText().toString();
+        int idCategoria = idCategoriaSelect;
 
         storageReference = storage.getReference("IMAGENES_RECLAMOS");
         final StorageReference refImgReclamos = storageReference.child(String.valueOf(System.currentTimeMillis()));
@@ -123,13 +117,13 @@ public class ViewReclamo extends AppCompatActivity {
             //Se añaden los valores introducidos de cada campo mediante clave(columna)/valor(valor introducido en el campo de texto)
             content.put(Constantes.COLUMN_TITULO, titulo);
             content.put(Constantes.COLUMN_DESCRIPCION, descripcion);
-            content.put(Constantes.COLUMN_CATEGORIA, categoria);
-            content.put(Constantes.COLUMN_LATITUD, latitud);
-            content.put(Constantes.COLUMN_LONGITUD, longitud);
+            content.put(Constantes.COLUMN_CALLE, calle);
             content.put(Constantes.COLUMN_BARRIO, barrio);
             content.put(Constantes.COLUMN_ZONA, zona);
-            content.put(Constantes.COLUMN_CALLE, calle);
-            content.put(Constantes.COLUMN_ESTADO, "NO ENVIADO");
+            content.put(Constantes.COLUMN_LATITUD, latitud);
+            content.put(Constantes.COLUMN_LONGITUD, longitud);
+            content.put(Constantes.COLUMN_ESTADO, "no enviado");
+            content.put(Constantes.COLUMN_ID_CATEGORIA, String.valueOf(idCategoria));
             UploadTask uploadTask = refImgReclamos.putFile(imgsUri[0]);
             Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
@@ -147,32 +141,23 @@ public class ViewReclamo extends AppCompatActivity {
                         try {
                             Uri downloadUri = task.getResult();
                             content.put(Constantes.COLUMN_IMAGEN, downloadUri.toString());
-                            SQLiteDatabase sqlite = dbReclamos.getReadableDatabase();
-                            sqlite.insert(Constantes.TABLE_RECLAMOS, null, content);
+                            SQLiteDatabase sqlite = dbReclamos.getWritableDatabase();
+                            sqlite.insert(Constantes.TABLE_RECLAMO, null, content);
                             sqlite.close();
                         } catch (Exception e) {
                             String error = e.getMessage();
-
                         }
-
                     }
                 }
             });
             Snackbar.make(view, "Reclamo guardado correctamente!!!", Snackbar.LENGTH_LONG).show();
-
             etTitulo.setText("");
             etDescripcion.setText("");
             etBarrio.setText("");
             etCalle.setText("");
             etZona.setText("");
-
             //selectAllReclamo(view);
-
         }
-
-        //Se cierra la conexión abierta a la Base de Datos
-
-
     }
 
     private boolean checkLocation() {
@@ -356,7 +341,7 @@ public class ViewReclamo extends AppCompatActivity {
         };
 
         //Ejecuta la sentencia devolviendo los resultados de los parámetros pasados de tabla, columnas, producto y orden de los resultados.
-        Cursor cursor = sqlite.query(Constantes.TABLE_RECLAMOS, columnas, null, null, null, null, null);
+        Cursor cursor = sqlite.query(Constantes.TABLE_RECLAMO, columnas, null, null, null, null, null);
 
         if (cursor.getCount() != 0) {
             cursor.moveToLast();
@@ -375,6 +360,8 @@ public class ViewReclamo extends AppCompatActivity {
         sqlite.close();
 
     }
+
+
 
 
 }

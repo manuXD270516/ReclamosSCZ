@@ -12,20 +12,20 @@ public class ReclamoModel {
     private double Longitud;
     private String Imagen;
     private String Estado;
-    private String Categoria;
+    private int IDCategoria;
 
-    public ReclamoModel(long ID, String titulo, String descripcion, String calle, String barrio, String zona, double latitud, double longitud, String imagen, String estado, String categoria) {
+    public ReclamoModel(long ID, String titulo, String descripcion, String calle, String barrio, String zona, double latitud, double longitud, String imagen, String estado, int IDCategoria) {
         this.ID = ID;
-        Titulo = titulo;
-        Descripcion = descripcion;
-        Calle = calle;
-        Barrio = barrio;
-        Zona = zona;
-        Latitud = latitud;
-        Longitud = longitud;
-        Imagen = imagen;
-        Estado = estado;
-        Categoria = categoria;
+        this.Titulo = titulo;
+        this.Descripcion = descripcion;
+        this.Calle = calle;
+        this.Barrio = barrio;
+        this.Zona = zona;
+        this.Latitud = latitud;
+        this.Longitud = longitud;
+        this.Imagen = imagen;
+        this.Estado = estado;
+        this.IDCategoria = IDCategoria;
     }
 
     public ReclamoModel() {
@@ -96,7 +96,7 @@ public class ReclamoModel {
     }
 
     public String getImagen() {
-        return Imagen;
+        return Imagen.isEmpty()?"":Imagen;
     }
 
     public void setImagen(String imagen) {
@@ -111,11 +111,11 @@ public class ReclamoModel {
         Estado = estado;
     }
 
-    public String getCategoria() {
-        return Categoria;
+    public int getIDCategoria() {
+        return IDCategoria;
     }
 
-    public void setCategoria(String categoria) {
-        Categoria = categoria;
+    public void setIDCategoria(int IDCategoria) {
+        this.IDCategoria = IDCategoria;
     }
 }

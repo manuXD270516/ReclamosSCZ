@@ -156,28 +156,43 @@ public class ViewIndex extends AppCompatActivity implements GoogleApiClient.OnCo
     }
 
     public void irCategorias(View view) {
-        /*TaskAsynkRegistrarReclamo taskAsync=new TaskAsynkRegistrarReclamo(getApplicationContext());
-        taskAsync.execute();*/
+        TaskAsynkRegistrarReclamo taskAsync=new TaskAsynkRegistrarReclamo(getApplicationContext());
+        taskAsync.setTrackReclamos(true);
+        taskAsync.execute();
 
-        enviarReclamo(new ReclamoModel(1,"titulo","desci","b","b","d",0,0,"sasda","valido","1"));
+        /*enviarReclamo(new ReclamoModel(
+                1,"titulo","desci","b","b","d",
+                0.3223,0.039392,"sasda","valido","1"));*/
 
-        /*Intent intent = new Intent(this, ViewCategorias.class);
+        Intent intent = new Intent(this, ViewCategorias.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);*/
+        startActivity(intent);
 
     }
 
 
 
     // METODO DE PRUEBA
-    public void enviarReclamo(final ReclamoModel reclamoModel){
-        String urlFinal=Constantes.URL_ADD_RECLAMO;
-        JsonObjectRequest peticion=new JsonObjectRequest(Request.Method.POST, urlFinal,
+    /*public void enviarReclamo(final ReclamoModel reclamoModel){
+        String urlFinal=Constantes.URL_ADD_RECLAMO_WS;
+        Map<String,String> params=new HashMap<>();
+        params.put(Constantes.COLUMN_TITULO,reclamoModel.getTitulo());
+        params.put(Constantes.COLUMN_DESCRIPCION,reclamoModel.getNombre());
+        params.put(Constantes.COLUMN_CALLE,reclamoModel.getCalle());
+        params.put(Constantes.COLUMN_BARRIO,reclamoModel.getBarrio());
+        params.put(Constantes.COLUMN_ZONA,reclamoModel.getZona());
+        params.put(Constantes.COLUMN_LATITUD,String.valueOf(reclamoModel.getLatitud()));
+        params.put(Constantes.COLUMN_LONGITUD,String.valueOf(reclamoModel.getLongitud()));
+        params.put(Constantes.COLUMN_IMAGEN,reclamoModel.getImagen());
+        params.put(Constantes.COLUMN_ESTADO,reclamoModel.getEstado());
+        params.put(Constantes.COLUMN_ID_CATEGORIA,reclamoModel.getIDCategoria());
+        JSONObject jsonObj=new JSONObject(params);
+        JsonObjectRequest peticion=new JsonObjectRequest(Request.Method.POST, urlFinal,jsonObj,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            Toast.makeText(ViewIndex.this  ,"PPPPP",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ViewIndex.this  ,"rrrrrrrrrrrrrrrr",Toast.LENGTH_SHORT).show();
                             //Log.i("VALIDAR ","############################"+response.getString("resp")+"##############################");
                             if (response.getString("resp").equals("SI")){
                                 //updateEstadoReclamo(reclamoModel.getID());
@@ -191,30 +206,14 @@ public class ViewIndex extends AppCompatActivity implements GoogleApiClient.OnCo
                 new Response.ErrorListener(){
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        int x=error.networkResponse.statusCode;
                         Log.i("VALIDAR ","############################ ERROR ##############################");
                     }
-                }) {
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params=new HashMap<>();
-                params.put(Constantes.COLUMN_TITULO,reclamoModel.getTitulo());
-                params.put(Constantes.COLUMN_DESCRIPCION,reclamoModel.getDescripcion());
-                params.put(Constantes.COLUMN_CALLE,reclamoModel.getCalle());
-                params.put(Constantes.COLUMN_BARRIO,reclamoModel.getBarrio());
-                params.put(Constantes.COLUMN_ZONA,reclamoModel.getZona());
-                params.put(Constantes.COLUMN_LATITUD,String.valueOf(reclamoModel.getLatitud()));
-                params.put(Constantes.COLUMN_LONGITUD,String.valueOf(reclamoModel.getLongitud()));
-                params.put(Constantes.COLUMN_IMAGEN,reclamoModel.getImagen());
-                params.put(Constantes.COLUMN_ESTADO,reclamoModel.getEstado());
-                params.put(Constantes.COLUMN_CATEGORIA,reclamoModel.getCategoria());
-                return params;
-            }
-        };
+                });
         RequestQueue requestQueue=Volley.newRequestQueue(this);
         requestQueue.add(peticion);
         requestQueue.getCache().clear();
-    }
+    }*/
 
 
 

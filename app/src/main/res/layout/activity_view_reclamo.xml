@@ -77,7 +77,7 @@
             <EditText
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:hint="Ingrese descripcion"
+                android:hint="Ingrese nombre"
                 android:id="@+id/etDescripcion_ReclamosView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

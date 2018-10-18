@@ -119,7 +119,7 @@ public class ViewLogin extends AppCompatActivity implements IViewPresenterLogin,
     private void loginGoogle() {
         RequestQueue queue = Volley.newRequestQueue(this);
 
-        String urlFinal= Constantes.URL_GET_CATEGORIAS;
+        String urlFinal= "";
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, urlFinal, new Response.Listener<String>() {
             @Override

@@ -17,11 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.ficct.reclamostopicos.reclamosscz.Model.CategoriaModel;
 import com.ficct.reclamostopicos.reclamosscz.R;
 import com.ficct.reclamostopicos.reclamosscz.WebServices.Constantes;
@@ -31,9 +29,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import com.ficct.reclamostopicos.reclamosscz.WebServices.*;
 
 public class ViewCategorias extends AppCompatActivity {
-
     public RecyclerView recyclerView;
     LinearLayoutManager layoutManager;
     private CategoriaAdapter adapter;
@@ -49,8 +47,8 @@ public class ViewCategorias extends AppCompatActivity {
 
 
     private void setCategorias() {
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String urlFinal= Constantes.URL_GET_CATEGORIAS;
+        //RequestQueue requestQueue=VolleySingleton.getInstance(this).addToRequestQueue();
+        String urlFinal= Constantes.URL_GET_CATEGORIAS_WS;
         JsonObjectRequest objRequest=new JsonObjectRequest(
                 Request.Method.GET, urlFinal,
                 new Response.Listener<JSONObject>() {
@@ -59,12 +57,15 @@ public class ViewCategorias extends AppCompatActivity {
                         try {
                             JSONArray array=response.getJSONArray("categorias");
                             for (int i=0;i<array.length();i++){
-                                CategoriaModel x= new CategoriaModel();
-                                x.setDescripcion(array.getJSONObject(i).getString("nombre"));
-                                x.setIdImg(R.drawable.ic_img_categoria);
-                                listaCategorias.add(x);
+                                CategoriaModel categoriaAct = new CategoriaModel();
+                                categoriaAct.setID(array.getJSONObject(i).getInt("id"));
+                                categoriaAct.setNombre(array.getJSONObject(i).getString("nombre"));
+                                categoriaAct.setDescripcion(array.getJSONObject(i).getString("descripcion"));
+                                categoriaAct.setIdImg(R.drawable.ic_img_categoria); // modificable
+                                listaCategorias.add(categoriaAct);
                             }
-
+                            adapter = new CategoriaAdapter(ViewCategorias.this, listaCategorias);
+                            recyclerView.setAdapter(adapter);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -72,10 +73,12 @@ public class ViewCategorias extends AppCompatActivity {
             },new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "El usuario no se puedo regustrar en la base de datos", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG).show();
                     }
         });
-        queue.add(objRequest);
+        VolleySingleton.getInstance(this).addToRequestQueue(objRequest);
+        //requestQueue.add(objRequest);
+        //queue.add(objRequest);
     }
 
 
@@ -85,21 +88,14 @@ public class ViewCategorias extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
         listaCategorias=new ArrayList<>();
-
-        CategoriaModel x= new CategoriaModel();
-        x.descripcion="SEGURIDAD URBANA (PRUEBA)";
+        /*CategoriaModel x= new CategoriaModel();
+        x.nombre="SEGURIDAD URBANA (PRUEBA)";
         x.setIdImg(R.drawable.ic_user_login);
-        listaCategorias.add(x);
-        //setCategorias();
-
-        adapter = new CategoriaAdapter(this, listaCategorias);
-        recyclerView.setAdapter(adapter);
-
-
-
+        listaCategorias.add(x);*/
+        setCategorias();
     }
 
-    /*private void tocarItem(final String titulo, final String descripcion, final String fecha) {
+    /*private void tocarItem(final String titulo, final String nombre, final String fecha) {
         final ArrayList<String> listItems = new ArrayList<>();
         listItems.add("Editar Datos");
         listItems.add("Eliminar");
@@ -112,7 +108,7 @@ public class ViewCategorias extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int item) {
                                 switch (item) {
                                     case 0:
-                                        editarItem(fecha, titulo, descripcion);
+                                        editarItem(fecha, titulo, nombre);
                                         break;
                                     case 1:
                                         eliminarItem(fecha, titulo);
@@ -127,7 +123,7 @@ public class ViewCategorias extends AppCompatActivity {
     }*/
 
 
-    /*private void editarItem(final String fecha, final String titulo, final String descripcion) {
+    /*private void editarItem(final String fecha, final String titulo, final String nombre) {
         final ArrayList<String> listItems = new ArrayList<>();
         listItems.add("Editar Titulo");
         listItems.add("Editar Descripcion");
@@ -144,7 +140,7 @@ public class ViewCategorias extends AppCompatActivity {
                                         editarVentana(titulo, fecha, "titulo");
                                         break;
                                     case 1:
-                                        editarVentana(descripcion, fecha, "descripcion");
+                                        editarVentana(nombre, fecha, "nombre");
                                         break;
                                     case 2:
                                         //  elegirEstado(fecha);
@@ -216,18 +212,21 @@ public class ViewCategorias extends AppCompatActivity {
             /*viewHolder.imagen.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    //tocarItem(publicacionesFilterList.get(i).getTitulo(), publicacionesFilterList.get(i).getDescripcion(), publicacionesFilterList.get(i).getFecha());
+                    //tocarItem(publicacionesFilterList.get(i).getTitulo(), publicacionesFilterList.get(i).getNombre(), publicacionesFilterList.get(i).getFecha());
                     return false;
                 }
             });*/
-            viewHolder.descripcion.setText(categoriasList.get(i).getDescripcion());
+            viewHolder.descripcion.setText(categoriasList.get(i).getNombre());
             viewHolder.imagen.setImageDrawable(getDrawable(R.drawable.ic_user_login));
             viewHolder.imagen.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                         //Toast.makeText(ViewCategorias.this,String.valueOf(i),Toast.LENGTH_SHORT).show();
                         Intent intent=new Intent(ViewCategorias.this,ViewReclamo.class);
-                        intent.putExtra("categoria", listaCategorias.get(i).getDescripcion());
+                        Bundle datosSendActivity=new Bundle();
+                        datosSendActivity.putString("nombre_categoria", listaCategorias.get(i).getNombre());
+                        datosSendActivity.putInt("id_categoria", listaCategorias.get(i).getID());
+                        intent.putExtras(datosSendActivity);
                         startActivity(intent);
                 }
             });

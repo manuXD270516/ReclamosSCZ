@@ -4,12 +4,12 @@ package com.ficct.reclamostopicos.reclamosscz.Database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.ficct.reclamostopicos.reclamosscz.WebServices.Constantes;
 
 
 public class DatabaseReclamos extends SQLiteOpenHelper{
-
 
 	private static final String TEXT_TYPE = " TEXT";
 	private static final String INTEGER_TYPE = " INTEGER";
@@ -18,7 +18,7 @@ public class DatabaseReclamos extends SQLiteOpenHelper{
 
 	private static final String COMMA_SEP = ",";
 	private static final String SQL_CREATE_ENTRIES =
-	    "CREATE TABLE " + Constantes.TABLE_RECLAMOS + " (" +
+	    "CREATE TABLE " + Constantes.TABLE_RECLAMO + " (" +
 				Constantes.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				Constantes.COLUMN_TITULO + TEXT_TYPE + COMMA_SEP +
 				Constantes.COLUMN_DESCRIPCION + TEXT_TYPE + COMMA_SEP +
@@ -27,11 +27,11 @@ public class DatabaseReclamos extends SQLiteOpenHelper{
 				Constantes.COLUMN_ZONA + TEXT_TYPE + COMMA_SEP +
 				Constantes.COLUMN_LATITUD + REAL_TYPE + COMMA_SEP +
 				Constantes.COLUMN_LONGITUD + REAL_TYPE + COMMA_SEP +
-				Constantes.COLUMN_IMAGEN + BLOB_TYPE + COMMA_SEP +
-				Constantes.COLUMN_CATEGORIA + TEXT_TYPE + COMMA_SEP +
-				Constantes.COLUMN_ESTADO + TEXT_TYPE + " )";
+				Constantes.COLUMN_IMAGEN + TEXT_TYPE + COMMA_SEP +
+				Constantes.COLUMN_ESTADO + TEXT_TYPE + COMMA_SEP +
+				Constantes.COLUMN_ID_CATEGORIA + INTEGER_TYPE + " );";
 
-	private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + Constantes.TABLE_RECLAMOS;
+	private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + Constantes.TABLE_RECLAMO;
 	public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "ReclamosDBLocal.sqlite";
 
@@ -43,6 +43,7 @@ public class DatabaseReclamos extends SQLiteOpenHelper{
 	//M�todo para crear la Tabla que recibe la consulta Transact-SQL
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		Log.i("TABLA SQL",SQL_CREATE_ENTRIES);
 		db.execSQL(SQL_CREATE_ENTRIES);
 	}
 

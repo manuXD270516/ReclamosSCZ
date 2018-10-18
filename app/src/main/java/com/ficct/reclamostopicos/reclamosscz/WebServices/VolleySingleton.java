@@ -1,4 +1,4 @@
-package com.informaciones.facultad.contaduriaalacima.WebServices;
+package com.ficct.reclamostopicos.reclamosscz.WebServices;
 
 import android.content.Context;
 import android.graphics.Bitmap;
