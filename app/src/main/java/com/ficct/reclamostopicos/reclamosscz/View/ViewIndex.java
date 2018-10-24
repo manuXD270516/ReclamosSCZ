@@ -26,8 +26,9 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
+import com.ficct.reclamostopicos.reclamosscz.Model.AsyncTaskRegistrarReclamo;
 import com.ficct.reclamostopicos.reclamosscz.Model.ReclamoModel;
-import com.ficct.reclamostopicos.reclamosscz.Model.TaskAsynkRegistrarReclamo;
+import com.ficct.reclamostopicos.reclamosscz.Model.AsyncTaskRegistrarReclamo;
 import com.ficct.reclamostopicos.reclamosscz.R;
 import com.ficct.reclamostopicos.reclamosscz.WebServices.Constantes;
 import com.google.android.gms.auth.api.Auth;
@@ -156,10 +157,10 @@ public class ViewIndex extends AppCompatActivity implements GoogleApiClient.OnCo
     }
 
     public void irCategorias(View view) {
-        TaskAsynkRegistrarReclamo taskAsync=new TaskAsynkRegistrarReclamo(getApplicationContext());
+        AsyncTaskRegistrarReclamo taskAsync=new AsyncTaskRegistrarReclamo(getApplicationContext());
         taskAsync.setTrackReclamos(true);
-        taskAsync.execute();
-
+        //taskAsync.execute();
+        taskAsync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         /*enviarReclamo(new ReclamoModel(
                 1,"titulo","desci","b","b","d",
                 0.3223,0.039392,"sasda","valido","1"));*/

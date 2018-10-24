@@ -1,5 +1,9 @@
 package com.ficct.reclamostopicos.reclamosscz.Model;
 
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+
 /**
  * Created by Manuel Saavedra
  */
@@ -57,4 +61,11 @@ public class CategoriaModel {
     }
 
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj!=null && obj instanceof CategoriaModel){
+            return this.getID()==((CategoriaModel)obj).getID();
+        }
+        return false;
+    }
 }

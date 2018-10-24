@@ -17,13 +17,14 @@ public class Constantes {
 
 
     public static final String IP_YPFBAVIACION="172.20.10.71";
-    public static final String IP_WIFI_MANUEL ="192.168.100.97";
+    public static final String IP_WIFI_MANUEL ="192.168.100.98";
+    public static final String IP_WIFI_MANUEL_2 ="192.168.43.96";
     public static final String IP_HUAWEI_ALEX="192.168.43.123";
 
 
 
-    public static final String URL_GET_CATEGORIAS_WS = "http://" + IP_WIFI_MANUEL + PUERTO_HOST + "/app-Reclamos/public/api/categorias";
-    public static final String URL_ADD_RECLAMO_WS = "http://" + IP_WIFI_MANUEL + PUERTO_HOST + "/app-Reclamos/public/api/guardarReclamo";
+    public static final String URL_GET_CATEGORIAS_WS = "http://" + IP_WIFI_MANUEL_2 + PUERTO_HOST + "/app-Reclamos/public/api/categorias";
+    public static final String URL_ADD_RECLAMO_WS = "http://" + IP_WIFI_MANUEL_2 + PUERTO_HOST + "/app-Reclamos/public/api/guardarReclamo";
 
 
     // CONSTANTES PARA LA BASE DE DATOS LOCAL

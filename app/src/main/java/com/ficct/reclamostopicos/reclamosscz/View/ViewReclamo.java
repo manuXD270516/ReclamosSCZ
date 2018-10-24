@@ -71,11 +71,12 @@ public class ViewReclamo extends AppCompatActivity {
 
     private void iniciarInstancias() {
         tvCategoria = (TextView) findViewById(R.id.tvCategoria_ReclamosView);
-        etBarrio = (EditText) findViewById(R.id.etBarrio_ReclamosView);
-        etCalle = (EditText) findViewById(R.id.etTitulo_ReclamosView);
-        etTitulo = (EditText) findViewById(R.id.etDescripcion_ReclamosView);
-        etDescripcion = (EditText) findViewById(R.id.etCalle_ReclamosView);
-        etZona = (EditText) findViewById(R.id.etZona_ReclamosView);
+        /*etBarrio = (EditText) findViewById(R.id.etBarrio_ReclamosView);
+        etCalle = (EditText) findViewById(R.id.etCalle_ReclamosView);
+        etZona = (EditText) findViewById(R.id.etZona_ReclamosView);*/
+        etTitulo = (EditText) findViewById(R.id.etTitulo_ReclamosView);
+        etDescripcion = (EditText) findViewById(R.id.etDescripcion_ReclamosView);
+
         swAnonimo = (Switch) findViewById(R.id.swAnonimo_ReclamosView);
         vpImgReclamos = (ViewPager) findViewById(R.id.vpImagenes_ViewReclamos);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -90,20 +91,17 @@ public class ViewReclamo extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void guardarReclamoLocal(final View view) throws IOException {
-        //selectAllReclamo(view);
         //Se inicializa la clase.
-
-
         //final SQLiteDatabase sqlite = dbReclamos.getWritableDatabase();
         String titulo = etTitulo.getText().toString();
         String descripcion = etDescripcion.getText().toString();
-        String calle = etCalle.getText().toString();
-        String zona = etCalle.getText().toString();
-        String barrio = etBarrio.getText().toString();
+        /*String calle = etCalle.getText().toString();
+        String zona = etZona.getText().toString();
+        String barrio = etBarrio.getText().toString();*/
         int idCategoria = idCategoriaSelect;
 
-        storageReference = storage.getReference("IMAGENES_RECLAMOS");
-        final StorageReference refImgReclamos = storageReference.child(String.valueOf(System.currentTimeMillis()));
+        //storageReference = storage.getReference("IMAGENES_RECLAMOS");
+        //final StorageReference refImgReclamos = storageReference.child(String.valueOf(System.currentTimeMillis()));
         /*byte[] inputData=null;
         if (imgsUri.length>0){
             InputStream iStream =   getContentResolver().openInputStream(imgsUri[0]);
@@ -117,14 +115,19 @@ public class ViewReclamo extends AppCompatActivity {
             //Se añaden los valores introducidos de cada campo mediante clave(columna)/valor(valor introducido en el campo de texto)
             content.put(Constantes.COLUMN_TITULO, titulo);
             content.put(Constantes.COLUMN_DESCRIPCION, descripcion);
-            content.put(Constantes.COLUMN_CALLE, calle);
-            content.put(Constantes.COLUMN_BARRIO, barrio);
-            content.put(Constantes.COLUMN_ZONA, zona);
+            content.put(Constantes.COLUMN_CALLE, "calle prueba");
+            content.put(Constantes.COLUMN_BARRIO, "barrio prueba");
+            content.put(Constantes.COLUMN_ZONA, "zona prueba");
             content.put(Constantes.COLUMN_LATITUD, latitud);
             content.put(Constantes.COLUMN_LONGITUD, longitud);
             content.put(Constantes.COLUMN_ESTADO, "no enviado");
             content.put(Constantes.COLUMN_ID_CATEGORIA, String.valueOf(idCategoria));
-            UploadTask uploadTask = refImgReclamos.putFile(imgsUri[0]);
+            byte[] dataImg=getBytes(getContentResolver().openInputStream(imgsUri[0]));
+            content.put(Constantes.COLUMN_IMAGEN,dataImg);
+            SQLiteDatabase sqlite = dbReclamos.getWritableDatabase();
+            sqlite.insert(Constantes.TABLE_RECLAMO, null, content);
+            sqlite.close();
+            /*UploadTask uploadTask = refImgReclamos.putFile(imgsUri[0]);
             Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
@@ -149,13 +152,13 @@ public class ViewReclamo extends AppCompatActivity {
                         }
                     }
                 }
-            });
+            });*/
             Snackbar.make(view, "Reclamo guardado correctamente!!!", Snackbar.LENGTH_LONG).show();
             etTitulo.setText("");
             etDescripcion.setText("");
-            etBarrio.setText("");
+            /*etBarrio.setText("");
             etCalle.setText("");
-            etZona.setText("");
+            etZona.setText("");*/
             //selectAllReclamo(view);
         }
     }
@@ -276,7 +279,6 @@ public class ViewReclamo extends AppCompatActivity {
             this.urlImages = urlImages;
         }
 
-
         @Override
         public int getCount() {
             return urlImages.length;
@@ -291,16 +293,12 @@ public class ViewReclamo extends AppCompatActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-
             LayoutInflater inflater = LayoutInflater.from(ViewReclamo.this);
             ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.slide_images, container, false);
             container.addView(layout);
             ImageView image = (ImageView) layout.findViewById(R.id.imageSlide);
-
             image.setImageURI(urlImages[position]);
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-
             return layout;
 
         }

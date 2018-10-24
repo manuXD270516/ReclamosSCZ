@@ -1,5 +1,7 @@
 package com.ficct.reclamostopicos.reclamosscz.Model;
 
+import android.widget.ImageButton;
+
 public class ReclamoModel {
 
     private long ID;
@@ -10,11 +12,11 @@ public class ReclamoModel {
     private String Zona;
     private double Latitud;
     private double Longitud;
-    private String Imagen;
+    private byte[] Imagen;
     private String Estado;
     private int IDCategoria;
 
-    public ReclamoModel(long ID, String titulo, String descripcion, String calle, String barrio, String zona, double latitud, double longitud, String imagen, String estado, int IDCategoria) {
+    public ReclamoModel(long ID, String titulo, String descripcion, String calle, String barrio, String zona, double latitud, double longitud, byte[] imagen, String estado, int IDCategoria) {
         this.ID = ID;
         this.Titulo = titulo;
         this.Descripcion = descripcion;
@@ -95,11 +97,11 @@ public class ReclamoModel {
         Longitud = longitud;
     }
 
-    public String getImagen() {
-        return Imagen.isEmpty()?"":Imagen;
+    public byte[] getImagen() {
+        return this.Imagen;
     }
 
-    public void setImagen(String imagen) {
+    public void setImagen(byte[] imagen) {
         Imagen = imagen;
     }
 

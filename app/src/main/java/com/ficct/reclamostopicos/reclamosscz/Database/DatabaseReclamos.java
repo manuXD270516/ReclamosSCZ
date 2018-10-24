@@ -27,7 +27,7 @@ public class DatabaseReclamos extends SQLiteOpenHelper{
 				Constantes.COLUMN_ZONA + TEXT_TYPE + COMMA_SEP +
 				Constantes.COLUMN_LATITUD + REAL_TYPE + COMMA_SEP +
 				Constantes.COLUMN_LONGITUD + REAL_TYPE + COMMA_SEP +
-				Constantes.COLUMN_IMAGEN + TEXT_TYPE + COMMA_SEP +
+				Constantes.COLUMN_IMAGEN + BLOB_TYPE + COMMA_SEP +
 				Constantes.COLUMN_ESTADO + TEXT_TYPE + COMMA_SEP +
 				Constantes.COLUMN_ID_CATEGORIA + INTEGER_TYPE + " );";
 
